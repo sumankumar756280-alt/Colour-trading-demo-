@@ -2,57 +2,119 @@
 <html>
 <head>
   <title>Color Trading Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      background:#0f0f0f;
+    body{
+      margin:0;
+      font-family: 'Segoe UI', Arial;
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
       color:white;
-      font-family:Arial;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+    }
+    .card{
+      background:#121212;
+      width:95%;
+      max-width:360px;
+      border-radius:16px;
+      padding:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.6);
       text-align:center;
     }
-    .box {
-      margin:40px auto;
-      padding:20px;
-      background:#1f1f1f;
-      border-radius:12px;
-      width:320px;
-      box-shadow:0 0 15px #000;
+    h2{
+      margin-top:5px;
+      letter-spacing:1px;
     }
-    button {
-      padding:10px 20px;
-      margin:5px;
-      font-size:15px;
+    .balance{
+      background:#1e1e1e;
+      padding:10px;
+      border-radius:10px;
+      margin-bottom:15px;
+      font-size:16px;
+    }
+    .buttons{
+      display:flex;
+      justify-content:space-between;
+      margin:15px 0;
+    }
+    button{
+      flex:1;
+      margin:0 5px;
+      padding:12px 0;
       border:none;
-      border-radius:6px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:bold;
       color:white;
       cursor:pointer;
+      transition:0.2s;
     }
-    .red {background:#e74c3c;}
-    .green {background:#2ecc71;}
-    .violet {background:#9b59b6;}
-    .recharge {background:#3498db; margin-top:10px;}
-    ul {padding-left:0; list-style:none;}
-    li {font-size:14px; margin:3px 0;}
+    button:active{
+      transform:scale(0.95);
+    }
+    .red{background:#e74c3c;}
+    .green{background:#2ecc71;}
+    .violet{background:#9b59b6;}
+
+    .timer{
+      font-size:22px;
+      margin:10px 0;
+    }
+    .result{
+      margin-top:8px;
+      font-size:15px;
+      min-height:20px;
+    }
+    .recharge{
+      margin-top:12px;
+      background:#3498db;
+      width:100%;
+    }
+    .history{
+      margin-top:15px;
+      background:#1b1b1b;
+      padding:10px;
+      border-radius:10px;
+      font-size:13px;
+    }
+    ul{
+      list-style:none;
+      padding:0;
+      margin:5px 0 0;
+    }
+    li{
+      margin:3px 0;
+    }
   </style>
 </head>
 
 <body>
 
-<div class="box">
-  <h2>Color Trading Demo</h2>
-  <p>Balance: ₹<span id="balance">1000</span></p>
+<div class="card">
+  <h2>Color Trading</h2>
 
-  <button class="red" onclick="selectColor('RED')">RED</button>
-  <button class="green" onclick="selectColor('GREEN')">GREEN</button>
-  <button class="violet" onclick="selectColor('VIOLET')">VIOLET</button>
+  <div class="balance">
+    Balance: ₹<span id="balance">1000</span>
+  </div>
 
-  <p id="timer">Timer: 30</p>
-  <p id="selected"></p>
-  <p id="result"></p>
+  <div class="buttons">
+    <button class="red" onclick="selectColor('RED')">RED</button>
+    <button class="green" onclick="selectColor('GREEN')">GREEN</button>
+    <button class="violet" onclick="selectColor('VIOLET')">VIOLET</button>
+  </div>
+
+  <div class="timer" id="timer">30</div>
+  <div id="selected"></div>
+  <div class="result" id="result"></div>
 
   <button class="recharge" onclick="recharge()">+ Recharge ₹500</button>
 
-  <h3>History</h3>
-  <ul id="history"></ul>
+  <div class="history">
+    <b>History</b>
+    <ul id="history"></ul>
+  </div>
 </div>
 
 <script>
@@ -64,10 +126,15 @@ let history = [];
 function selectColor(color){
   selectedColor = color;
   document.getElementById("selected").innerText =
-    "You selected: " + color;
+    "Selected: " + color;
 }
 
 function getRandomColor(){
+  let admin = localStorage.getItem("adminResult");
+  if(admin){
+    localStorage.removeItem("adminResult");
+    return admin;
+  }
   const colors = ["RED","GREEN","VIOLET"];
   return colors[Math.floor(Math.random()*3)];
 }
@@ -75,23 +142,22 @@ function getRandomColor(){
 function recharge(){
   balance += 500;
   document.getElementById("balance").innerText = balance;
-  alert("₹500 added (Demo)");
 }
 
 setInterval(()=>{
   time--;
-  document.getElementById("timer").innerText = "Timer: " + time;
+  document.getElementById("timer").innerText = time;
 
   if(time === 0){
     const winColor = getRandomColor();
-    let text = "";
+    let text;
 
     if(selectedColor === winColor){
       balance += 100;
-      text = "WIN (" + winColor + ")";
+      text = "WIN - " + winColor;
     } else {
       balance -= 100;
-      text = "LOSE (" + winColor + ")";
+      text = "LOSE - " + winColor;
     }
 
     history.unshift(text);
@@ -100,8 +166,8 @@ setInterval(()=>{
     document.getElementById("history").innerHTML =
       history.map(h=>"<li>"+h+"</li>").join("");
 
-    document.getElementById("balance").innerText = balance;
     document.getElementById("result").innerText = text;
+    document.getElementById("balance").innerText = balance;
 
     time = 30;
     selectedColor = "";
