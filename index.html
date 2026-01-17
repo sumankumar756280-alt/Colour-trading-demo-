@@ -4,30 +4,34 @@
   <title>Color Trading Demo</title>
   <style>
     body {
-      background:#111;
+      background:#0f0f0f;
       color:white;
       font-family:Arial;
       text-align:center;
     }
     .box {
-      margin:50px auto;
+      margin:40px auto;
       padding:20px;
-      background:#222;
-      border-radius:10px;
-      width:300px;
+      background:#1f1f1f;
+      border-radius:12px;
+      width:320px;
+      box-shadow:0 0 15px #000;
     }
     button {
       padding:10px 20px;
       margin:5px;
-      font-size:16px;
+      font-size:15px;
       border:none;
-      border-radius:5px;
+      border-radius:6px;
       color:white;
       cursor:pointer;
     }
-    .red {background:red;}
-    .green {background:green;}
-    .violet {background:purple;}
+    .red {background:#e74c3c;}
+    .green {background:#2ecc71;}
+    .violet {background:#9b59b6;}
+    .recharge {background:#3498db; margin-top:10px;}
+    ul {padding-left:0; list-style:none;}
+    li {font-size:14px; margin:3px 0;}
   </style>
 </head>
 
@@ -44,12 +48,18 @@
   <p id="timer">Timer: 30</p>
   <p id="selected"></p>
   <p id="result"></p>
+
+  <button class="recharge" onclick="recharge()">+ Recharge ₹500</button>
+
+  <h3>History</h3>
+  <ul id="history"></ul>
 </div>
 
 <script>
 let time = 30;
 let selectedColor = "";
 let balance = 1000;
+let history = [];
 
 function selectColor(color){
   selectedColor = color;
@@ -62,24 +72,40 @@ function getRandomColor(){
   return colors[Math.floor(Math.random()*3)];
 }
 
+function recharge(){
+  balance += 500;
+  document.getElementById("balance").innerText = balance;
+  alert("₹500 added (Demo)");
+}
+
 setInterval(()=>{
   time--;
   document.getElementById("timer").innerText = "Timer: " + time;
 
   if(time === 0){
     const winColor = getRandomColor();
+    let text = "";
+
     if(selectedColor === winColor){
       balance += 100;
-      document.getElementById("result").innerText =
-        "🎉 WIN! Color was " + winColor;
+      text = "WIN (" + winColor + ")";
     } else {
       balance -= 100;
-      document.getElementById("result").innerText =
-        "❌ LOSE! Color was " + winColor;
+      text = "LOSE (" + winColor + ")";
     }
+
+    history.unshift(text);
+    if(history.length > 5) history.pop();
+
+    document.getElementById("history").innerHTML =
+      history.map(h=>"<li>"+h+"</li>").join("");
+
     document.getElementById("balance").innerText = balance;
+    document.getElementById("result").innerText = text;
+
     time = 30;
     selectedColor = "";
+    document.getElementById("selected").innerText = "";
   }
 },1000);
 </script>
