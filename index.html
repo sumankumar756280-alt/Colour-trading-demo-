@@ -6,8 +6,8 @@
   <style>
     body{
       margin:0;
-      font-family: 'Segoe UI', Arial;
-      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      font-family:Segoe UI, Arial;
+      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
       color:white;
       display:flex;
       justify-content:center;
@@ -18,21 +18,47 @@
       background:#121212;
       width:95%;
       max-width:360px;
-      border-radius:16px;
+      border-radius:18px;
       padding:20px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.6);
       text-align:center;
-    }
-    h2{
-      margin-top:5px;
-      letter-spacing:1px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.6);
     }
     .balance{
       background:#1e1e1e;
       padding:10px;
       border-radius:10px;
       margin-bottom:15px;
-      font-size:16px;
+    }
+    .ring{
+      position:relative;
+      width:140px;
+      height:140px;
+      margin:15px auto;
+    }
+    svg{
+      transform:rotate(-90deg);
+    }
+    circle{
+      fill:none;
+      stroke-width:10;
+      stroke-linecap:round;
+    }
+    .bg{
+      stroke:#333;
+    }
+    .progress{
+      stroke:#2ecc71;
+      stroke-dasharray:440;
+      stroke-dashoffset:0;
+      transition:stroke-dashoffset 1s linear;
+    }
+    .time{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      font-size:26px;
+      font-weight:bold;
     }
     .buttons{
       display:flex;
@@ -45,48 +71,33 @@
       padding:12px 0;
       border:none;
       border-radius:10px;
-      font-size:14px;
       font-weight:bold;
       color:white;
       cursor:pointer;
       transition:0.2s;
     }
-    button:active{
-      transform:scale(0.95);
-    }
+    button:active{transform:scale(0.95);}
     .red{background:#e74c3c;}
     .green{background:#2ecc71;}
     .violet{background:#9b59b6;}
-
-    .timer{
-      font-size:22px;
-      margin:10px 0;
+    .recharge{
+      width:100%;
+      margin-top:10px;
+      background:#3498db;
     }
     .result{
-      margin-top:8px;
-      font-size:15px;
       min-height:20px;
-    }
-    .recharge{
-      margin-top:12px;
-      background:#3498db;
-      width:100%;
+      margin-top:8px;
     }
     .history{
-      margin-top:15px;
       background:#1b1b1b;
+      margin-top:15px;
       padding:10px;
       border-radius:10px;
       font-size:13px;
     }
-    ul{
-      list-style:none;
-      padding:0;
-      margin:5px 0 0;
-    }
-    li{
-      margin:3px 0;
-    }
+    ul{list-style:none;padding:0;margin:5px 0 0;}
+    li{margin:3px 0;}
   </style>
 </head>
 
@@ -99,13 +110,20 @@
     Balance: ₹<span id="balance">1000</span>
   </div>
 
+  <div class="ring">
+    <svg width="140" height="140">
+      <circle class="bg" cx="70" cy="70" r="70"/>
+      <circle class="progress" cx="70" cy="70" r="70"/>
+    </svg>
+    <div class="time" id="time">30</div>
+  </div>
+
   <div class="buttons">
     <button class="red" onclick="selectColor('RED')">RED</button>
     <button class="green" onclick="selectColor('GREEN')">GREEN</button>
     <button class="violet" onclick="selectColor('VIOLET')">VIOLET</button>
   </div>
 
-  <div class="timer" id="timer">30</div>
   <div id="selected"></div>
   <div class="result" id="result"></div>
 
@@ -118,15 +136,17 @@
 </div>
 
 <script>
-let time = 30;
-let selectedColor = "";
+let total = 30;
+let time = total;
 let balance = 1000;
+let selectedColor = "";
 let history = [];
+const circle = document.querySelector(".progress");
+const circumference = 440;
 
-function selectColor(color){
-  selectedColor = color;
-  document.getElementById("selected").innerText =
-    "Selected: " + color;
+function selectColor(c){
+  selectedColor = c;
+  document.getElementById("selected").innerText = "Selected: " + c;
 }
 
 function getRandomColor(){
@@ -135,7 +155,7 @@ function getRandomColor(){
     localStorage.removeItem("adminResult");
     return admin;
   }
-  const colors = ["RED","GREEN","VIOLET"];
+  const colors=["RED","GREEN","VIOLET"];
   return colors[Math.floor(Math.random()*3)];
 }
 
@@ -146,30 +166,29 @@ function recharge(){
 
 setInterval(()=>{
   time--;
-  document.getElementById("timer").innerText = time;
+  document.getElementById("time").innerText = time;
+  circle.style.strokeDashoffset =
+    circumference - (time/total)*circumference;
 
   if(time === 0){
-    const winColor = getRandomColor();
+    const win = getRandomColor();
     let text;
-
-    if(selectedColor === winColor){
+    if(selectedColor === win){
       balance += 100;
-      text = "WIN - " + winColor;
+      text = "WIN - " + win;
     } else {
       balance -= 100;
-      text = "LOSE - " + winColor;
+      text = "LOSE - " + win;
     }
-
     history.unshift(text);
     if(history.length > 5) history.pop();
 
     document.getElementById("history").innerHTML =
       history.map(h=>"<li>"+h+"</li>").join("");
-
     document.getElementById("result").innerText = text;
     document.getElementById("balance").innerText = balance;
 
-    time = 30;
+    time = total;
     selectedColor = "";
     document.getElementById("selected").innerText = "";
   }
