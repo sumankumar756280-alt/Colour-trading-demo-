@@ -18,69 +18,70 @@
     }
     button {
       padding:10px 20px;
-      margin:8px;
+      margin:5px;
       font-size:16px;
       border:none;
       border-radius:5px;
+      color:white;
       cursor:pointer;
     }
-    .red {background:red;color:white;}
-    .green {background:green;color:white;}
-    .violet {background:purple;color:white;}
-
-    #result {
-      margin-top:15px;
-      font-size:18px;
-      font-weight:bold;
-    }
+    .red {background:red;}
+    .green {background:green;}
+    .violet {background:purple;}
   </style>
 </head>
+
 <body>
 
 <div class="box">
   <h2>Color Trading Demo</h2>
-  <p>Select Color (Learning Purpose)</p>
+  <p>Balance: ₹<span id="balance">1000</span></p>
 
   <button class="red" onclick="selectColor('RED')">RED</button>
   <button class="green" onclick="selectColor('GREEN')">GREEN</button>
   <button class="violet" onclick="selectColor('VIOLET')">VIOLET</button>
 
   <p id="timer">Timer: 30</p>
-  <p id="result">No color selected</p>
+  <p id="selected"></p>
+  <p id="result"></p>
 </div>
 
 <script>
-  let time = 30;
-  let selectedColor = "None";
+let time = 30;
+let selectedColor = "";
+let balance = 1000;
 
-  function selectColor(color) {
-    selectedColor = color;
-    document.getElementById("result").innerText =
-      "Selected: " + color;
+function selectColor(color){
+  selectedColor = color;
+  document.getElementById("selected").innerText =
+    "You selected: " + color;
+}
+
+function getRandomColor(){
+  const colors = ["RED","GREEN","VIOLET"];
+  return colors[Math.floor(Math.random()*3)];
+}
+
+setInterval(()=>{
+  time--;
+  document.getElementById("timer").innerText = "Timer: " + time;
+
+  if(time === 0){
+    const winColor = getRandomColor();
+    if(selectedColor === winColor){
+      balance += 100;
+      document.getElementById("result").innerText =
+        "🎉 WIN! Color was " + winColor;
+    } else {
+      balance -= 100;
+      document.getElementById("result").innerText =
+        "❌ LOSE! Color was " + winColor;
+    }
+    document.getElementById("balance").innerText = balance;
+    time = 30;
+    selectedColor = "";
   }
-
-  function startTimer() {
-    let countdown = setInterval(() => {
-      time--;
-      document.getElementById("timer").innerText =
-        "Timer: " + time;
-
-      if (time === 0) {
-        clearInterval(countdown);
-
-        alert("Round Over! You selected: " + selectedColor);
-
-        time = 30;
-        selectedColor = "None";
-        document.getElementById("result").innerText =
-          "No color selected";
-
-        startTimer();
-      }
-    }, 1000);
-  }
-
-  startTimer();
+},1000);
 </script>
 
 </body>
