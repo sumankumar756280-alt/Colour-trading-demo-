@@ -10,14 +10,15 @@
       text-align:center;
     }
     .box {
-      margin-top:50px;
+      margin:50px auto;
       padding:20px;
       background:#222;
       border-radius:10px;
+      width:300px;
     }
     button {
       padding:10px 20px;
-      margin:10px;
+      margin:8px;
       font-size:16px;
       border:none;
       border-radius:5px;
@@ -26,20 +27,61 @@
     .red {background:red;color:white;}
     .green {background:green;color:white;}
     .violet {background:purple;color:white;}
+
+    #result {
+      margin-top:15px;
+      font-size:18px;
+      font-weight:bold;
+    }
   </style>
 </head>
 <body>
 
-  <div class="box">
-    <h1>Color Trading Demo</h1>
-    <p>Select Color (Learning Purpose)</p>
+<div class="box">
+  <h2>Color Trading Demo</h2>
+  <p>Select Color (Learning Purpose)</p>
 
-    <button class="red">RED</button>
-    <button class="green">GREEN</button>
-    <button class="violet">VIOLET</button>
+  <button class="red" onclick="selectColor('RED')">RED</button>
+  <button class="green" onclick="selectColor('GREEN')">GREEN</button>
+  <button class="violet" onclick="selectColor('VIOLET')">VIOLET</button>
 
-    <p>Timer: 30s</p>
-  </div>
+  <p id="timer">Timer: 30</p>
+  <p id="result">No color selected</p>
+</div>
+
+<script>
+  let time = 30;
+  let selectedColor = "None";
+
+  function selectColor(color) {
+    selectedColor = color;
+    document.getElementById("result").innerText =
+      "Selected: " + color;
+  }
+
+  function startTimer() {
+    let countdown = setInterval(() => {
+      time--;
+      document.getElementById("timer").innerText =
+        "Timer: " + time;
+
+      if (time === 0) {
+        clearInterval(countdown);
+
+        alert("Round Over! You selected: " + selectedColor);
+
+        time = 30;
+        selectedColor = "None";
+        document.getElementById("result").innerText =
+          "No color selected";
+
+        startTimer();
+      }
+    }, 1000);
+  }
+
+  startTimer();
+</script>
 
 </body>
 </html>
